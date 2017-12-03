@@ -1,0 +1,114 @@
+body {
+    font-family: 'Work Sans', sans-serif;
+    background-color: #666666;
+}
+
+.title {
+  text-align: center;
+  font-size: 40px;
+}
+
+.btn-properties {
+    height: 9vh;
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    font-family: 'Work Sans', sans-serif;
+}
+
+.btn-properties#easy {
+    /*background-color: #21409B;*/
+    background-color: #FF9000;
+}
+
+.btn-properties#medium {
+    background-color: #FF9000;
+}
+
+.btn-properties#hard {
+    /*background-color: #000000;*/
+    background-color: #FF9000;
+
+}
+
+/*td { 
+  width: 33em; padding-top: 33%; line-height: 1; border: 1px solid white; background-color: black; 
+}*/
+
+.square{
+    width:100px;
+    height:100px;
+}
+
+.v{
+    border-left:1px solid #000;
+    border-right:1px solid #000;
+}
+
+.h{
+    border-top:1px solid #000;
+    border-bottom:1px solid #000;
+}
+
+.display {
+  z-index: 1;
+}
+
+.background-image {
+  width: 100vw;
+  height: 100vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/images/background.png");
+  background-size: cover;
+  position: relative; 
+  margin-top: 0px !important;
+}
+
+.centered-element {
+  position: absolute;
+  left: 50%;
+  text-align: center;
+}
+
+.easy-btn {
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.med-btn {
+  top: 60%;
+  transform: translateX(-50%) translateY(-60%);
+}
+
+.hard-btn {
+  top: 70%;
+  transform: translateX(-50%) translateY(-70%);
+}
+
+.center-base {
+  width: 55%;
+  margin: .7em auto;
+  overflow: hidden;
+  text-align: center;
+  font-weight: 300;
+  color: #fff;
+}
+
+/*
+div {
+    width: 310px;
+    height: 600px;
+}
+div div {
+    width: 100px;
+    height: 100px;
+    float: left;
+}
+div div:nth-child(-n+3) {
+    border-bottom: 1px solid;
+}
+div div:nth-child(-n+6) {
+    border-bottom: 1px solid;
+}
+div div:nth-child(1), div:nth-child(2), div:nth-child(4), div:nth-child(5), div:nth-child(7), div:nth-child(8) {
+    border-right: 1px solid;
+}*/

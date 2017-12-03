@@ -1,0 +1,21 @@
+<% include partials/header %>
+<% if (difficulty === 'easy') { %>
+<div id="easy-difficulty"></div>
+<% } else { %>
+<div id="hard-difficulty"></div>
+<% } %>
+  
+<div id="main-view" class="row" style="width: 100%;">
+  <div id="blocks-view" class="display col-md-6" style="margin: 0 auto"></div>
+  <div id="grid-view" class="display col-md-6" style="margin: 0 auto"></div>
+</div>
+
+<!--
+<div class="row">
+  <div id="test-view" class="col-md-10 col-md-offset-1" style="width: 100%"></div>
+</div>
+-->
+
+<script src="/javascripts/game.js"></script>
+
+<% include partials/footer %>
