@@ -6,7 +6,7 @@ var w = window,
     y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
 var xOffset = 20;
-var yOffset = 10;
+var yOffset = 6;
 
 var blocks = [];
 var blockCounts = {
@@ -191,26 +191,31 @@ window.onresize = function() {
   console.log('resized, new x: ' + (blocksView.offsetWidth-(xOffset)));
   renderer.resize(x, y);
 
-  //squareWidth = gridView.offsetWidth/gridLength;
-  squareWidth = gridView.offsetWidth/gridLength * 5/6;
+  squareWidth = gridView.offsetWidth/gridLength;
+  //squareWidth = gridView.offsetWidth/gridLength * 5/6;
   //easy difficulty
-  //background.x = (x/2)-(xOffset);
-  //background.x = x/4;
 
-  //background.x = blocksView.offsetWidth-(xOffset);
-  background.x = 7/6*blocksView.offsetWidth-(xOffset);
+  background.x = blocksView.offsetWidth-(xOffset);
+  //background.x = 7/6*blocksView.offsetWidth-(xOffset);
 
   background.y = yOffset;
-  // background.width = gridView.offsetWidth;
-  // background.height = gridView.offsetWidth;
-  background.width = gridView.offsetWidth * 5/6;
-  background.height = gridView.offsetWidth * 5/6;
+  background.width = gridView.offsetWidth;
+  background.height = gridView.offsetWidth;
+  // background.width = gridView.offsetWidth * 5/6;
+  // background.height = gridView.offsetWidth * 5/6;
   squareWidth = gridView.offsetWidth/gridLength;
   for (var i = 0; i < blocks.length; i++) {
-    // blocks[i].width = blocks[i].widthScale*squareWidth-2;
-    // blocks[i].height = blocks[i].heightScale*squareWidth-2;
-    blocks[i].width = 5/6*blocks[i].widthScale*squareWidth-2;
-    blocks[i].height = 5/6*blocks[i].heightScale*squareWidth-2;
+    blocks[i].width = blocks[i].widthScale*squareWidth-2;
+    blocks[i].height = blocks[i].heightScale*squareWidth-2;
+    checkBlockWidth(blocks[i]);
+    determineBlockLocation(blocks[i], blocks[i].blockType, blocks[i].rotation);
+    if (blocks[i].currentPoints.length === 0) {
+      console.log('resizing!!!');
+      blocks[i].x = blocks[i].initX;
+      blocks[i].y = blocks[i].initY;
+    } 
+    // blocks[i].width = 5/6*blocks[i].widthScale*squareWidth-2;
+    // blocks[i].height = 5/6*blocks[i].heightScale*squareWidth-2;
 
   }
   //background.height = x/2;
@@ -396,6 +401,58 @@ if (document.getElementById('easy-difficulty') !== null) {
   //generate board of 8x8
 }
 
+function determineBlockLocation(block, blockType, rotation) {
+  switch(blockType) {
+    case '1x1':
+      block.widthScale = 1; block.heightScale = 1;
+
+      block.initX = squareWidth + xOffset;
+      block.initY = squareWidth + yOffset;
+      break;
+    case '2x1':
+      block.widthScale = 2; block.heightScale = 1;
+      if (rotation === Math.PI || rotation === 0) {
+        block.initX = 3*squareWidth + xOffset;
+      } else {
+        block.initX = 5*squareWidth + xOffset;
+      }
+      
+      block.initY = squareWidth + yOffset;
+      break;
+    case '2x2':
+      block.widthScale = 2; block.heightScale = 2;
+
+      block.initX = 1.25*squareWidth + xOffset;
+      block.initY = 2.25*squareWidth + 2*yOffset;
+      break;
+    case '2x2-1':
+      block.widthScale = 2; block.heightScale = 2;
+      switch (rotation) {
+        case 0:
+          block.initX = 3*squareWidth + xOffset;
+          block.initY = 2.25*squareWidth + 2*yOffset;
+          break;
+        case Math.PI:
+          block.initX = 5*squareWidth + xOffset;
+          block.initY = 2.25*squareWidth + 2*yOffset;
+          break;
+        case Math.PI/2:
+        console.log('GOT PI/2')
+          block.initX = squareWidth + xOffset;
+          block.initY = squareWidth + 3*yOffset + 4*squareWidth + 1;
+          break;
+        case Math.PI*3/2:
+          block.initX = 4*squareWidth + 2*xOffset;
+          block.initY = squareWidth + 3*yOffset + 4*squareWidth + 1;
+          break;
+      }
+
+      
+      //block.y = squareWidth + 2*yOffset + 2*squareWidth;
+      break;
+  }
+}
+
 function initBlocks() {
   for (var i = 0; i < unplacedBlocks.length; i++) {
     var blockType = unplacedBlocks[i]['block-type'];
@@ -408,55 +465,10 @@ function initBlocks() {
     blockCounts[blockType]++;
 
     //this determines how to display it (how many squares wide/tall)
-    switch(blockType) {
-      case '1x1':
-        block.widthScale = 1; block.heightScale = 1;
-
-        block.x = squareWidth + xOffset;
-        block.y = squareWidth + yOffset;
-        break;
-      case '2x1':
-        block.widthScale = 2; block.heightScale = 1;
-        if (unplacedBlocks[i]['rotation'] === Math.PI || unplacedBlocks[i]['rotation'] === 0) {
-          block.x = 3*squareWidth + xOffset;
-        } else {
-          block.x = 5*squareWidth + xOffset;
-        }
-        
-        block.y = squareWidth + yOffset;
-        break;
-      case '2x2':
-        block.widthScale = 2; block.heightScale = 2;
-
-        block.x = squareWidth + xOffset;
-        block.y = squareWidth + 2*yOffset + 2*squareWidth;
-        break;
-      case '2x2-1':
-        block.widthScale = 2; block.heightScale = 2;
-        switch (unplacedBlocks[i]['rotation']) {
-          case 0:
-            block.x = 3*squareWidth + 2*xOffset;
-            block.y = squareWidth + 2*yOffset + 2*squareWidth - 1;
-            break;
-          case Math.PI:
-            block.x = 4*squareWidth + 3*xOffset;
-            block.y = squareWidth + 2*yOffset + 2*squareWidth + 1;
-            break;
-          case Math.PI/2:
-          console.log('GOT PI/2')
-            block.x = squareWidth + xOffset;
-            block.y = squareWidth + 3*yOffset + 4*squareWidth + 1;
-            break;
-          case Math.PI*3/2:
-            block.x = 4*squareWidth + 2*xOffset;
-            block.y = squareWidth + 3*yOffset + 4*squareWidth + 1;
-            break;
-        }
-
-        
-        //block.y = squareWidth + 2*yOffset + 2*squareWidth;
-        break;
-    }
+    //block, blockType, rotation
+    determineBlockLocation(block, blockType, unplacedBlocks[i]['rotation']);
+    block.x = block.initX;
+    block.y = block.initY;
 
     //fill in data for rotation
     //current points are the points that the block occupies -- used for when block is moved along grid (prev. values must be reset to 0)
@@ -489,8 +501,10 @@ function initBlocks() {
 
     // block.x = 100;
     // block.y = 100;
-    block.width = (block.widthScale * squareWidth)-2;
-    block.height = (block.heightScale * squareWidth)-2;
+    block.defaultWidth = (block.widthScale * squareWidth)-2;
+    block.defaultHeight = (block.heightScale * squareWidth)-2;
+    block.width = block.defaultWidth/2;
+    block.height = block.defaultHeight/2;
     // if (blockType === '2x1') {
     //   block.y = 300;
 
@@ -508,7 +522,7 @@ function initBlocks() {
     block.buttonMode = true;
     block.moving = false;
     block.dragging = false;
-
+    checkBlockWidth(this);
     
     block.mouseover = function(mouseData) {
         if (this.moving) {
@@ -531,9 +545,72 @@ function initBlocks() {
       }
       this.moving = !this.moving;
       if (!this.moving) {
-        blockPlacement();
-        
+        checkBlockWidth(this);
+        currentlyHoldingBlock = null;
+        this.alpha = 1;
+        this.dragging = false;
+        this.data = null;
+        var widthScale = this.widthScale;
+        var heightScale = this.heightScale;
+        if (this.blockType === '2x1' && (this.rotatedBy === 'pi/2' || this.rotatedBy === '3pi/2')) {
+            var temp = heightScale;
+            heightScale = widthScale;
+            widthScale = temp;
+
+        } 
+        if (Math.round((this.x - (widthScale/2*squareWidth)) / squareWidth) >= gridLength) { //if block fits
+          this.x = Math.round((this.x - (widthScale/2*squareWidth)) / squareWidth) * squareWidth - xOffset + 1 + (widthScale/2*squareWidth);
+          this.y = Math.round((this.y - (heightScale/2*squareWidth)) / squareWidth) * squareWidth + 1 + yOffset  + (heightScale/2*squareWidth);
+
+          var col = Math.round((this.x+xOffset)/squareWidth) - gridLength - 1;
+          var row = Math.round((this.y-yOffset)/squareWidth) - 1;
+
+          var pointDirections = this.fromLeft.split('+');
+          //console.log(pointDirections);
+          if (pointDirections.includes('0') && grid[row][col] === 1) {
+            console.log('snapping back because current is taken' + 'r:' + row + 'c:' + col);
+            this.x = this.anchorX;
+            this.y = this.anchorY;
+            return;
+          }
+          for (point in pointDirections) {
+            if (!testPoint(col, row, pointDirections[point].split(''))) {
+              console.log('snapping back because adjacent is taken');
+              this.x = this.anchorX;
+              this.y = this.anchorY;
+              return;
+            }
+          }
+          //now this works
+          //update grid
+          if(pointDirections.includes('0')) {
+            grid[row][col] = 1;
+          }
+          for (point in this.currentPoints) {
+            grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
+            this.currentPoints = [];
+          }
+
+          for (point in pointDirections) {
+            updatePoint(col, row, pointDirections[point].split(''), this);
+          }
+          console.log('PLACED POINT=======');
+          console.log(grid);
+          // this.anchorX = this.x;
+          // this.anchorY = this.y;
+          checkWon();
+        } else { //block does not fit -- clear current points
+          for (point in this.currentPoints) {
+            grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
+            this.currentPoints = [];
+          }
+          this.x = this.anchorX;
+          this.y = this.anchorY;
+        }
+          
       } else {
+        this.width = this.defaultWidth;
+        this.height = this.defaultHeight;
         currentlyHoldingBlock = this;
         this.data = mouseData.data;
           //this.dragging = true;
@@ -542,7 +619,72 @@ function initBlocks() {
 
     block.mouseup = function(mouseData) {
       if (this.dragging) {
-        blockPlacement(this);
+        checkBlockWidth(this);
+        currentlyHoldingBlock = null;
+        this.moving = false;
+        this.alpha = 1;
+        this.dragging = false;
+        this.data = null;
+        var widthScale = this.widthScale;
+        var heightScale = this.heightScale;
+        if (this.blockType === '2x1' && (this.rotatedBy === 'pi/2' || this.rotatedBy === '3pi/2')) {
+            var temp = heightScale;
+            heightScale = widthScale;
+            widthScale = temp;
+
+        } 
+        if (Math.round((this.x - (widthScale/2*squareWidth)) / squareWidth) >= gridLength) {
+          this.x = Math.round((this.x - (widthScale/2*squareWidth)) / squareWidth) * squareWidth - xOffset + 1 + (widthScale/2*squareWidth);
+          this.y = Math.round((this.y - (heightScale/2*squareWidth)) / squareWidth) * squareWidth + 1 + yOffset  + (heightScale/2*squareWidth);
+
+          var col = Math.round((this.x+xOffset)/squareWidth) - gridLength - 1;
+          var row = Math.round((this.y-yOffset)/squareWidth) - 1;
+
+          var pointDirections = this.fromLeft.split('+');
+          //console.log(pointDirections);
+          if (pointDirections.includes('0') && grid[row][col] === 1) {
+            console.log('snapping back because current is taken' + 'r:' + row + 'c:' + col);
+            this.x = this.anchorX;
+            this.y = this.anchorY;
+            return;
+          }
+          for (point in pointDirections) {
+            if (!testPoint(col, row, pointDirections[point].split(''))) {
+              console.log('snapping back because adjacent is taken');
+              this.x = this.anchorX;
+              this.y = this.anchorY;
+              return;
+            }
+          }
+          //now this works
+          //update grid
+          if(pointDirections.includes('0')) {
+            grid[row][col] = 1;
+          }
+          for (point in this.currentPoints) {
+            grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
+            this.currentPoints = [];
+          }
+
+          for (point in pointDirections) {
+            updatePoint(col, row, pointDirections[point].split(''), this);
+          }
+          console.log('PLACED POINT=======');
+          console.log(grid);
+          //this.anchorX = this.x;
+          //this.anchorY = this.y;
+          checkWon();
+        } else { //block does not fit
+          if (this.currentPoints.length != 0) {
+            for (point in this.currentPoints) {
+              grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
+              this.currentPoints = [];
+            }
+          }
+          this.x = this.anchorX;
+          this.y = this.anchorY;
+          console.log('width: ' + this.width + 'height: ' + this.height);
+        }
       }
     }
 
@@ -551,9 +693,13 @@ function initBlocks() {
         if (this.moving) {
             this.dragging = true;
             var newPosition = this.data.getLocalPosition(this.parent);
+            
+            //moved here
             this.position.x = newPosition.x;
             this.position.y = newPosition.y;
-        }
+
+            //checkBlockWidth(this);
+         }
     }
     blocks.push(block);
     stage.addChild(block);
@@ -567,67 +713,13 @@ function initBlocks() {
   initText();
 }
 
-function blockPlacement(block) {
-  currentlyHoldingBlock = null;
-  block.alpha = 1;
-  block.dragging = false;
-  block.data = null;
-  var widthScale = block.widthScale;
-  var heightScale = block.heightScale;
-  if (block.blockType === '2x1' && (block.rotatedBy === 'pi/2' || block.rotatedBy === '3pi/2')) {
-      var temp = heightScale;
-      heightScale = widthScale;
-      widthScale = temp;
-
-  } 
-  if (Math.round((block.x - (widthScale/2*squareWidth)) / squareWidth) >= gridLength) { //if block fits
-    block.x = Math.round((block.x - (widthScale/2*squareWidth)) / squareWidth) * squareWidth - xOffset + 1 + (widthScale/2*squareWidth);
-    block.y = Math.round((block.y - (heightScale/2*squareWidth)) / squareWidth) * squareWidth + 1 + yOffset  + (heightScale/2*squareWidth);
-
-    var col = Math.round((block.x+xOffset)/squareWidth) - gridLength - 1;
-    var row = Math.round((block.y-yOffset)/squareWidth) - 1;
-
-    var pointDirections = block.fromLeft.split('+');
-    //console.log(pointDirections);
-    if (pointDirections.includes('0') && grid[row][col] === 1) {
-      console.log('snapping back because current is taken' + 'r:' + row + 'c:' + col);
-      block.x = block.anchorX;
-      block.y = block.anchorY;
-      return;
-    }
-    for (point in pointDirections) {
-      if (!testPoint(col, row, pointDirections[point].split(''))) {
-        console.log('snapping back because adjacent is taken');
-        block.x = block.anchorX;
-        block.y = block.anchorY;
-        return;
-      }
-    }
-    //now block works
-    //update grid
-    if(pointDirections.includes('0')) {
-      grid[row][col] = 1;
-    }
-    for (point in block.currentPoints) {
-      grid[block.currentPoints[point][0]][block.currentPoints[point][1]] = 0;
-      block.currentPoints = [];
-    }
-
-    for (point in pointDirections) {
-      updatePoint(col, row, pointDirections[point].split(''), block);
-    }
-    console.log('PLACED POINT=======');
-    console.log(grid);
-    // block.anchorX = block.x;
-    // block.anchorY = block.y;
-    checkWon();
-  } else { //block does not fit -- clear current points
-    for (point in block.currentPoints) {
-      grid[block.currentPoints[point][0]][block.currentPoints[point][1]] = 0;
-      block.currentPoints = [];
-    }
-    block.x = block.anchorX;
-    block.y = block.anchorY;
+function checkBlockWidth(block) {
+  if (block.x > x/2) {
+    block.width = block.defaultWidth;
+    block.height = block.defaultHeight;
+  } else {
+    block.width = block.defaultWidth/2;
+    block.height = block.defaultHeight/2;
   }
 }
 
@@ -636,7 +728,7 @@ function initBlockPlacement() {
 }
 
 function initText() {
-
+  
 }
 
 function testPoint(col, row, pointDirection) {
