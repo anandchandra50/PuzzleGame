@@ -10,10 +10,16 @@ var yOffset = 6;
 
 var blocks = [];
 var blockCounts = {
-  '1x1': 0,
-  '2x1': 0,
-  '2x2-1': 0,
-  '2x2': 0
+  '1x1|0': 0,
+  '2x1|0': 0,
+  '2x1|pi/2': 0,
+  '2x1|pi': 0,
+  '2x1|3pi/2': 0,
+  '2x2-1|0': 0,
+  '2x2-1|pi/2': 0,
+  '2x2-1|pi': 0,
+  '2x2-1|3pi/2': 0,
+  '2x2|0': 0
 }
 
 var currentlyHoldingBlock = null;
@@ -204,6 +210,8 @@ window.onresize = function() {
   // background.width = gridView.offsetWidth * 5/6;
   // background.height = gridView.offsetWidth * 5/6;
   squareWidth = gridView.offsetWidth/gridLength;
+  clearTexts();
+  initTexts();
   for (var i = 0; i < blocks.length; i++) {
     blocks[i].width = blocks[i].widthScale*squareWidth-2;
     blocks[i].height = blocks[i].heightScale*squareWidth-2;
@@ -412,7 +420,7 @@ function determineBlockLocation(block, blockType, rotation) {
     case '2x1':
       block.widthScale = 2; block.heightScale = 1;
       if (rotation === Math.PI || rotation === 0) {
-        block.initX = 3*squareWidth + xOffset;
+        block.initX = 3.125*squareWidth + xOffset;
       } else {
         block.initX = 5*squareWidth + xOffset;
       }
@@ -429,7 +437,7 @@ function determineBlockLocation(block, blockType, rotation) {
       block.widthScale = 2; block.heightScale = 2;
       switch (rotation) {
         case 0:
-          block.initX = 3*squareWidth + xOffset;
+          block.initX = 3.125*squareWidth + xOffset;
           block.initY = 2.25*squareWidth + 2*yOffset;
           break;
         case Math.PI:
@@ -442,8 +450,8 @@ function determineBlockLocation(block, blockType, rotation) {
           block.initY = squareWidth + 3*yOffset + 4*squareWidth + 1;
           break;
         case Math.PI*3/2:
-          block.initX = 4*squareWidth + 2*xOffset;
-          block.initY = squareWidth + 3*yOffset + 4*squareWidth + 1;
+          block.initX = 1.25*squareWidth + xOffset;
+          block.initY = 3.5*squareWidth + 3*yOffset;
           break;
       }
 
@@ -462,7 +470,7 @@ function initBlocks() {
     block.anchor.y = 0.5;
 
     //this is a counter of the number of each block type -- used for displaying how many blocks of each are left to place
-    blockCounts[blockType]++;
+    
 
     //this determines how to display it (how many squares wide/tall)
     //block, blockType, rotation
@@ -492,7 +500,8 @@ function initBlocks() {
         block.rotatedBy = '3pi/2';
         break;
     }
-    
+
+    blockCounts[blockType + '|' + block.rotatedBy]++;
     //determine x and y placement
     //x can always be 1/10th into the screen
     //y can be ordered: 1x1 and 2x1 then 2x2-1 then 2x2 (each one has 1/3 of screen then?)
@@ -540,11 +549,11 @@ function initBlocks() {
 
 
     block.mousedown = function(mouseData) {
-      if (currentlyHoldingBlock !== this && currentlyHoldingBlock !== null) {
+      if (currentlyHoldingBlock !== this && currentlyHoldingBlock !== null) { //this means you're already holding one and clicked another
         return;
       }
       this.moving = !this.moving;
-      if (!this.moving) {
+      if (!this.moving) { //no longer moving so tried to place
         checkBlockWidth(this);
         currentlyHoldingBlock = null;
         this.alpha = 1;
@@ -559,6 +568,7 @@ function initBlocks() {
 
         } 
         if (Math.round((this.x - (widthScale/2*squareWidth)) / squareWidth) >= gridLength) { //if block fits
+          console.log('on grid');
           this.x = Math.round((this.x - (widthScale/2*squareWidth)) / squareWidth) * squareWidth - xOffset + 1 + (widthScale/2*squareWidth);
           this.y = Math.round((this.y - (heightScale/2*squareWidth)) / squareWidth) * squareWidth + 1 + yOffset  + (heightScale/2*squareWidth);
 
@@ -571,6 +581,12 @@ function initBlocks() {
             console.log('snapping back because current is taken' + 'r:' + row + 'c:' + col);
             this.x = this.anchorX;
             this.y = this.anchorY;
+            blockCounts[this.blockType + '|' + this.rotatedBy]++;
+            updateTexts();
+            checkBlockWidth(this);
+            // if (unplacedBlocks.indexOf(this) === -1) {
+            //   unplacedBlocks.push(this);
+            // }
             return;
           }
           for (point in pointDirections) {
@@ -578,6 +594,12 @@ function initBlocks() {
               console.log('snapping back because adjacent is taken');
               this.x = this.anchorX;
               this.y = this.anchorY;
+              blockCounts[this.blockType + '|' + this.rotatedBy]++;
+              updateTexts();
+              checkBlockWidth(this);
+              // if (unplacedBlocks.indexOf(this) === -1) {
+              //   unplacedBlocks.push(this);
+              // }
               return;
             }
           }
@@ -588,31 +610,47 @@ function initBlocks() {
           }
           for (point in this.currentPoints) {
             grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
-            this.currentPoints = [];
+            
           }
+          this.currentPoints = [];
 
           for (point in pointDirections) {
             updatePoint(col, row, pointDirections[point].split(''), this);
           }
           console.log('PLACED POINT=======');
           console.log(grid);
-          // this.anchorX = this.x;
-          // this.anchorY = this.y;
+          // unplacedBlocks.splice(unplacedBlocks.indexOf(this), 1);
           checkWon();
         } else { //block does not fit -- clear current points
+          console.log('not on grid');
           for (point in this.currentPoints) {
             grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
-            this.currentPoints = [];
           }
+          this.currentPoints = [];
           this.x = this.anchorX;
           this.y = this.anchorY;
+          blockCounts[this.blockType + '|' + this.rotatedBy]++;
+          updateTexts();
+          checkBlockWidth(this);
+          // if (unplacedBlocks.indexOf(this) === -1) {
+          //   unplacedBlocks.push(this);
+          // }
         }
           
-      } else {
+      } else { //now picking up block
+        console.log('Picked up block');
         this.width = this.defaultWidth;
         this.height = this.defaultHeight;
         currentlyHoldingBlock = this;
         this.data = mouseData.data;
+        for (point in this.currentPoints) {
+          grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
+        }
+        blockCounts[this.blockType + '|' + this.rotatedBy]--;
+        console.log(blockCounts);
+        updateTexts();
+        this.currentPoints = [];
+        console.log(grid);
           //this.dragging = true;
       }
     }
@@ -646,6 +684,12 @@ function initBlocks() {
             console.log('snapping back because current is taken' + 'r:' + row + 'c:' + col);
             this.x = this.anchorX;
             this.y = this.anchorY;
+            blockCounts[this.blockType + '|' + this.rotatedBy]++;
+            updateTexts();
+            checkBlockWidth(this);
+            // if (unplacedBlocks.indexOf(this) === -1) {
+            //   unplacedBlocks.push(this);
+            // }
             return;
           }
           for (point in pointDirections) {
@@ -653,6 +697,12 @@ function initBlocks() {
               console.log('snapping back because adjacent is taken');
               this.x = this.anchorX;
               this.y = this.anchorY;
+              blockCounts[this.blockType + '|' + this.rotatedBy]++;
+              updateTexts();
+              checkBlockWidth(this);
+              // if (unplacedBlocks.indexOf(this) === -1) {
+              //   unplacedBlocks.push(this);
+              // }
               return;
             }
           }
@@ -663,8 +713,9 @@ function initBlocks() {
           }
           for (point in this.currentPoints) {
             grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
-            this.currentPoints = [];
+            
           }
+          this.currentPoints = [];
 
           for (point in pointDirections) {
             updatePoint(col, row, pointDirections[point].split(''), this);
@@ -673,16 +724,24 @@ function initBlocks() {
           console.log(grid);
           //this.anchorX = this.x;
           //this.anchorY = this.y;
+          // unplacedBlocks.splice(unplacedBlocks.indexOf(this), 1);
           checkWon();
         } else { //block does not fit
           if (this.currentPoints.length != 0) {
             for (point in this.currentPoints) {
               grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
-              this.currentPoints = [];
+              
             }
+            this.currentPoints = [];
           }
           this.x = this.anchorX;
           this.y = this.anchorY;
+          blockCounts[this.blockType + '|' + this.rotatedBy]++;
+          updateTexts();
+          checkBlockWidth(this);
+          // if (unplacedBlocks.indexOf(this) === -1) {
+          //   unplacedBlocks.push(this);
+          // }
           console.log('width: ' + this.width + 'height: ' + this.height);
         }
       }
@@ -710,7 +769,7 @@ function initBlocks() {
   //this is now done with all blocks
   //init text next to blocks
   initBlockPlacement();
-  initText();
+  initTexts();
 }
 
 function checkBlockWidth(block) {
@@ -727,8 +786,85 @@ function initBlockPlacement() {
 
 }
 
-function initText() {
-  
+var text1x1;
+var text2x10;
+var text2x1rotate;
+var text2x2;
+var text2x2_10;
+var text2x2_1pi;
+var text2x2_13pihalf;
+
+function clearTexts() {
+  stage.removeChild(text1x1);
+  stage.removeChild(text2x10);
+  stage.removeChild(text2x1rotate);
+  stage.removeChild(text2x2);
+  stage.removeChild(text2x2_10);
+  stage.removeChild(text2x2_1pi);
+  stage.removeChild(text2x2_13pihalf);
+}
+
+function initTexts() {
+
+  var style = new PIXI.TextStyle({
+    fontFamily: 'Avenir',
+    fontSize: 20,
+    fontWeight: 'bold',
+  });
+
+  text1x1 = new PIXI.Text(blockCounts['1x1|0']+'x', style);
+  text1x1.x = squareWidth + xOffset-squareWidth/2;
+  text1x1.y = squareWidth;
+  if (blockCounts['1x1|0'] !== 0) stage.addChild(text1x1);
+
+  text2x10 = new PIXI.Text((blockCounts['2x1|0'] + blockCounts['2x1|pi']) +'x', style);
+  text2x10.x = 2.375*squareWidth + xOffset;
+  text2x10.y = squareWidth; 
+  if (blockCounts['2x1|0'] + blockCounts['2x1|pi'] !== 0) stage.addChild(text2x10);
+
+  text2x1rotate = new PIXI.Text((blockCounts['2x1|pi/2'] + blockCounts['2x1|3pi/2'])+'x', style);
+  text2x1rotate.x = 4.25*squareWidth + xOffset;
+  text2x1rotate.y = squareWidth;
+  if (blockCounts['2x1|pi/2'] + blockCounts['2x1|3pi/2'] !== 0) stage.addChild(text2x1rotate);
+
+  text2x2 = new PIXI.Text(blockCounts['2x2|0']+'x', style);
+  text2x2.x = squareWidth + xOffset-squareWidth/2;
+  text2x2.y = 2.125*squareWidth + 2*yOffset;
+  if (blockCounts['2x2|0'] !== 0) stage.addChild(text2x2);
+
+  text2x2_10 = new PIXI.Text(blockCounts['2x2-1|0']+'x', style);
+  text2x2_10.x = 2.375*squareWidth + xOffset;
+  text2x2_10.y = 2.125*squareWidth + 2*yOffset;
+  if (blockCounts['2x2-1|0'] !== 0) stage.addChild(text2x2_10);
+
+  text2x2_1pi = new PIXI.Text(blockCounts['2x2-1|pi']+'x', style);
+  text2x2_1pi.x = 4.25*squareWidth + xOffset;
+  text2x2_1pi.y = 2.125*squareWidth + 2*yOffset;
+  if (blockCounts['2x2-1|pi'] !== 0) stage.addChild(text2x2_1pi);
+
+
+//below
+  text2x2_13pihalf = new PIXI.Text(blockCounts['2x2-1|3pi/2']+'x', style);
+  text2x2_13pihalf.x = squareWidth + xOffset-squareWidth/2;
+  text2x2_13pihalf.y = 3.5*squareWidth + 3*yOffset;
+  if (blockCounts['2x2-1|3pi/2'] !== 0) stage.addChild(text2x2_13pihalf);
+}
+
+function updateTexts() {
+  text1x1.setText(blockCounts['1x1|0']+'x');
+
+  text2x10.setText((blockCounts['2x1|0'] + blockCounts['2x1|pi']) +'x');
+
+  text2x1rotate.setText((blockCounts['2x1|pi/2'] + blockCounts['2x1|3pi/2'])+'x');
+
+  text2x2.setText(blockCounts['2x2|0']+'x');
+
+  text2x2_10.setText(blockCounts['2x2-1|0']+'x');
+
+  text2x2_1pi.setText(blockCounts['2x2-1|pi']+'x');
+
+  text2x2_13pihalf.setText(blockCounts['2x2-1|3pi/2']+'x');
+
 }
 
 function testPoint(col, row, pointDirection) {
