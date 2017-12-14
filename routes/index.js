@@ -6,6 +6,10 @@ router.get('/', function(req, res, next) {
   res.render('index');
 });
 
+router.post('/', function(req, res, next) {
+  res.render('index');
+});
+
 router.get('/easy', function(req, res, next){
   res.render('puzzle', { difficulty: 'easy' });
 }); 

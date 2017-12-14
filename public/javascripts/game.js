@@ -702,6 +702,9 @@ function checkWon() {
   }
   //do something about winning now because its over!!
   console.log('WON WON WON!!!');
+
+  document.
+
   return true;
 }
 

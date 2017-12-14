@@ -1,3 +1,5 @@
+
+
 var w = window,
     d = document,
     e = d.documentElement,
@@ -646,7 +648,10 @@ function initBlocks() {
         for (point in this.currentPoints) {
           grid[this.currentPoints[point][0]][this.currentPoints[point][1]] = 0;
         }
-        blockCounts[this.blockType + '|' + this.rotatedBy]--;
+        if (this.x < x/2) {
+          blockCounts[this.blockType + '|' + this.rotatedBy]--;
+        }
+        
         console.log(blockCounts);
         updateTexts();
         this.currentPoints = [];
@@ -930,6 +935,9 @@ function checkWon() {
   }
   //do something about winning now because its over!!
   console.log('WON WON WON!!!');
+
+  document.getElementById('finished-button').style.visibility = 'visible';
+
   return true;
 }
 
