@@ -1,5 +1,3 @@
-
-
 var w = window,
     d = document,
     e = d.documentElement,
@@ -386,9 +384,66 @@ function initiate() { //width is width of board in squares, height is height in 
 
 
 if (document.getElementById('easy-difficulty') !== null) {
+  gridLength = 6;
+  gridHeight = 6;
   squareWidth = gridView.offsetWidth/gridLength;
   //easy difficulty
   background = PIXI.Sprite.fromImage('images/6x6-grid.png');
+  //background.x = (x/2)-(xOffset);
+  //background.x = x/4;
+  background.x = blocksView.offsetWidth-(xOffset);
+
+  background.y = yOffset;
+  background.width = gridView.offsetWidth;
+  //background.width = x/2;
+  background.height = gridView.offsetWidth;
+  //background.height = x/2;
+  stage.addChild(background);
+  grid = new Array(gridHeight);
+  for (var i = 0; i < gridHeight; i++) {
+    grid[i] = new Array(gridLength);
+    for (var j = 0; j < gridLength; j++) {
+      grid[i][j] = -1;
+    }
+  }
+
+  initiate();
+  //generate board of 8x8
+}
+
+if (document.getElementById('medium-difficulty') !== null) {
+  gridLength = 8;
+  gridHeight = 8;
+  squareWidth = gridView.offsetWidth/gridLength;
+  //easy difficulty
+  background = PIXI.Sprite.fromImage('images/8x8-grid.png');
+  //background.x = (x/2)-(xOffset);
+  //background.x = x/4;
+  background.x = blocksView.offsetWidth-(xOffset);
+
+  background.y = yOffset;
+  background.width = gridView.offsetWidth;
+  //background.width = x/2;
+  background.height = gridView.offsetWidth;
+  //background.height = x/2;
+  stage.addChild(background);
+  grid = new Array(gridHeight);
+  for (var i = 0; i < gridHeight; i++) {
+    grid[i] = new Array(gridLength);
+    for (var j = 0; j < gridLength; j++) {
+      grid[i][j] = -1;
+    }
+  }
+  initiate();
+  //generate board of 8x8
+}
+
+if (document.getElementById('hard-difficulty') !== null) {
+  gridLength = 12;
+  gridHeight = 12;
+  squareWidth = gridView.offsetWidth/gridLength;
+  //easy difficulty
+  background = PIXI.Sprite.fromImage('images/12x12-grid.png');
   //background.x = (x/2)-(xOffset);
   //background.x = x/4;
   background.x = blocksView.offsetWidth-(xOffset);

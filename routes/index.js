@@ -13,6 +13,14 @@ router.post('/', function(req, res, next) {
 router.get('/easy', function(req, res, next){
   res.render('puzzle', { difficulty: 'easy' });
 }); 
+
+router.get('/medium', function(req, res, next){
+  res.render('puzzle', { difficulty: 'medium' });
+}); 
+
+router.get('/hard', function(req, res, next){
+  res.render('puzzle', { difficulty: 'hard' });
+}); 
 /*
 router.get('/easy', function(req, res, next){
   res.render('puzzle', { difficulty: 'easy' });

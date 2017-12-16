@@ -1,9 +1,11 @@
 <% include partials/header %>
 <% if (difficulty === 'easy') { %>
 <div id="easy-difficulty"></div>
+<% } else if (difficulty === 'medium') { %>
+<div id="medium-difficulty"></div>
 <% } else { %>
 <div id="hard-difficulty"></div>
-<% } %>
+<% } %> 
   
 <div id="main-view" class="row" style="width: 100%;">
   <div id="blocks-view" class="display col-md-6" style="margin: 0 auto"></div>
